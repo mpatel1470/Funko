@@ -1,14 +1,14 @@
-terraform {
-  required_providers {
-    aws = {
-      version = ">= <v1.2.4>"
-      source = "hashicorp/aws"
-    }
-  }
-}
+# terraform {
+#   required_providers {
+#     aws = {
+#       version = "1.2.4"
+#       source = "hashicorp/aws"
+#     }
+#   }
+# }
 provider "aws" {
   profile = "default"
-  region  = "us-west-2"
+  region  = "us-east-1"
 }
 
 resource "aws_vpc" "nginx-vpc" {
@@ -23,7 +23,7 @@ resource "aws_subnet" "prod-subnet-public-1" {
   vpc_id                  = aws_vpc.nginx-vpc.id // Referencing the id of the VPC from abouve code block
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = "true" // Makes this a public subnet
-  availability_zone       = "us-west-2a"
+  availability_zone       = "us-east-1a"
 }
 
 resource "aws_internet_gateway" "prod-igw" {
@@ -68,13 +68,19 @@ ingress {
   }
 }
 
+# variable "key_name" {default="aws-key"}
+# resource "tls_private_key" "aws-key" {
+#   algorithm = "RSA"
+#   rsa_bits  = 4096
+# }
+
 resource "aws_key_pair" "aws-key" {
   key_name   = "aws-key"
   public_key = file(var.PUBLIC_KEY_PATH)// Path is in the variables file
 }
 
 resource "aws_instance" "nginx_server" {
-  ami           = "ami-08d70e59c07c61a3a"
+  ami           = "ami-052efd3df9dad4825"
   instance_type = "t2.micro"
 tags = {
     Name = "nginx_server"
